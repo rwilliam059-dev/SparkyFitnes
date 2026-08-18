@@ -8,6 +8,7 @@ interface ApiCallOptions extends RequestInit {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params?: Record<string, any>;
   suppress404Toast?: boolean; // New option to suppress toast for 404 errors
+  suppressErrorToast?: boolean;
   externalApi?: boolean;
   isFormData?: boolean; // New option to indicate if the body is FormData
   responseType?: 'json' | 'text' | 'blob'; // Add responseType option
@@ -240,11 +241,13 @@ export async function apiCall<T = any>(
         );
         return null as unknown as T; // Return null for 404 with suppression
       } else {
-        toast({
-          title: 'API Error',
-          description: getSafeToastErrorMessage(errorMessage),
-          variant: 'destructive',
-        });
+        if (!options?.suppressErrorToast) {
+          toast({
+            title: 'API Error',
+            description: getSafeToastErrorMessage(errorMessage),
+            variant: 'destructive',
+          });
+        }
         if (
           errorMessage.includes('Authentication: Invalid or expired token.')
         ) {
@@ -281,14 +284,16 @@ export async function apiCall<T = any>(
 
     const errorMessage = err instanceof Error ? err.message : String(err);
     logging.error(userLoggingLevel, 'API call network error:', err); // Log the raw error object for better debugging
-    toast({
-      title: 'Network Error',
-      description: getSafeToastErrorMessage(
-        errorMessage,
-        'Could not connect to the server.'
-      ),
-      variant: 'destructive',
-    });
+    if (!options?.suppressErrorToast) {
+      toast({
+        title: 'Network Error',
+        description: getSafeToastErrorMessage(
+          errorMessage,
+          'Could not connect to the server.'
+        ),
+        variant: 'destructive',
+      });
+    }
     throw new Error(errorMessage, { cause: err });
   }
 }

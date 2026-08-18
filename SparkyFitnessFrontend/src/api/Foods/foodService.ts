@@ -195,6 +195,9 @@ export const searchFoodsV2 = async (
   return apiCall(`/v2/foods/search/${providerType}`, {
     method: 'GET',
     params,
+    // Live provider search owns its error UX. Avoid a second global API toast
+    // when an upstream provider is temporarily unavailable or rate limited.
+    suppressErrorToast: true,
   });
 };
 

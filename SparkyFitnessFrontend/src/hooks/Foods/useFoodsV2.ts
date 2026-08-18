@@ -56,9 +56,9 @@ export const searchFoodsV2Options = (
     searchFoodsV2(providerType, query, providerId, page, pageSize, autoScale),
   staleTime: 1000 * 60 * 5,
   enabled: !!query,
-  meta: {
-    errorMessage: `Failed to search ${providerType} foods.`,
-  },
+  // Provider lookups are already user-driven and can be rate limited upstream.
+  // Retrying a rejected live-search call immediately only increases pressure.
+  retry: false,
 });
 
 export const searchBarcodeV2Options = (
