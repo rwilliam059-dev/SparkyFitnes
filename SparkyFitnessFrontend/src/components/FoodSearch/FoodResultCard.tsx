@@ -42,20 +42,11 @@ interface FoodResultCardProps {
   isMeal?: boolean;
   isOnline?: boolean;
   providerLabel?: string;
-  // When set, the provider badge is tinted with this colour (used by the All
-  // Providers "Top Matches" section to tell sources apart at a glance).
   providerBadgeColor?: string;
-  /**
-   * Explicit image override. Provider search results pass the upstream URL
-   * here; local foods and meals fall back to their own stored `images`.
-   */
   imageUrl?: string;
   nutrientConfig: NutrientGridConfig;
   onCardClick?: () => void;
   onEditClick?: () => void;
-  // Whether this row is starred. Passed down rather than queried per-card: the
-  // parent already holds the favorites Set, so one card mounting N rows is one
-  // lookup, not N copies of useFavoritesQuery.
   isFavorite?: boolean;
 }
 
@@ -75,17 +66,9 @@ const FoodResultCard = ({
   const { activeUserId } = useActiveUser();
   const isFood = !isMeal;
   const foodItem = item as Food;
-  // Provider results carry a single upstream `image_url`; imported foods and
-  // meals carry an `images` array. resolveFoodImageSrc handles both absolute
-  // provider URLs and server-relative upload paths.
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  // Set when the thumbnail 404s and we swap to the full-size variant, so the
-  // viewer opens the image that actually loaded rather than the failed one.
   const [thumbnailFailed, setThumbnailFailed] = useState(false);
-  // Providers that serve a small and a full-size variant give us both; if the
-  // small one is missing upstream, swap to the full size before giving up.
   const fallbackImageSrc = resolveFoodImageSrc(foodItem.image_source_url);
-  // All images for the viewer; provider results only ever have the one.
   const galleryImages = (() => {
     const own = usableFoodImages(item.images);
     if (own.length > 0) {
@@ -100,8 +83,6 @@ const FoodResultCard = ({
   })();
   const resolvedImageSrc = galleryImages[0] ?? null;
   const mealItem = item as Meal;
-  // Hex opacity suffixes are only valid on a full #rrggbb value; other colour
-  // formats (CSS vars, named colours, #rgb) are used as-is without a tint.
   const badgeIsHex =
     !!providerBadgeColor &&
     providerBadgeColor.startsWith('#') &&
@@ -112,17 +93,13 @@ const FoodResultCard = ({
       className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${onCardClick ? 'cursor-pointer' : ''}`}
       onClick={onCardClick}
     >
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start gap-3">
-          {/* Thumbnail rail, mirroring the diary rows: image on the left with
-              the name and nutrients stacked beside it, so a row with a photo
-              is no taller than one without. */}
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           {resolvedImageSrc && (
             <button
               type="button"
-              className="shrink-0 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="self-start shrink-0 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               onClick={(e) => {
-                // The card itself is clickable; don't also select the food.
                 e.stopPropagation();
                 setLightboxOpen(true);
               }}
@@ -131,31 +108,26 @@ const FoodResultCard = ({
               <img
                 src={resolvedImageSrc}
                 alt={item.name}
-                className="w-14 h-14 object-cover rounded-md cursor-zoom-in"
+                className="h-16 w-16 cursor-zoom-in rounded-md object-cover sm:h-14 sm:w-14"
                 loading="lazy"
                 onError={(e) => {
                   const img = e.currentTarget;
-                  // One-shot flag rather than comparing src: the browser
-                  // resolves `img.src` to an absolute URL, so a relative
-                  // fallback would never compare equal and would retry forever.
                   if (fallbackImageSrc && !img.dataset['triedFallback']) {
                     img.dataset['triedFallback'] = 'true';
                     img.src = fallbackImageSrc;
-                    // Point the viewer at the same replacement.
                     setThumbnailFailed(true);
                     return;
                   }
-                  // A dead provider link shouldn't leave a broken-image icon.
                   img.style.display = 'none';
                 }}
               />
             </button>
           )}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-2">
-              <h3 className="font-medium">{item.name}</h3>
+          <div className="w-full min-w-0 flex-1">
+            <div className="mb-2 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+              <h3 className="min-w-0 break-words font-medium">{item.name}</h3>
               {isFood && foodItem.brand && (
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="max-w-full text-xs">
                   {foodItem.brand}
                 </Badge>
               )}
@@ -167,7 +139,7 @@ const FoodResultCard = ({
               {providerLabel && (
                 <Badge
                   variant="outline"
-                  className="text-xs"
+                  className="max-w-full text-xs"
                   style={
                     providerBadgeColor
                       ? {
@@ -185,9 +157,7 @@ const FoodResultCard = ({
                   {providerLabel}
                 </Badge>
               )}
-              {isFood && foodItem.provider_verified && (
-                <ProviderVerifiedBadge />
-              )}
+              {isFood && foodItem.provider_verified && <ProviderVerifiedBadge />}
               {isFood &&
                 foodItem.default_variant?.source === 'ai_estimate' &&
                 foodItem.default_variant.ai_confidence && (
@@ -195,7 +165,7 @@ const FoodResultCard = ({
                     variant="outline"
                     className={`text-xs ${AI_BADGE_TONE_CLASSES[CONFIDENCE_TONES[foodItem.default_variant.ai_confidence as AiConfidence]]}`}
                   >
-                    <Sparkles className="h-3 w-3 mr-1" />
+                    <Sparkles className="mr-1 h-3 w-3" />
                     AI{' '}
                     {
                       OVERALL_CONFIDENCE_LABELS[
@@ -208,9 +178,7 @@ const FoodResultCard = ({
               {!isOnline &&
                 item.user_id &&
                 item.user_id === activeUserId &&
-                !(isFood
-                  ? foodItem.shared_with_public
-                  : mealItem.is_public) && (
+                !(isFood ? foodItem.shared_with_public : mealItem.is_public) && (
                   <Badge variant="outline" className="text-xs">
                     {t('enhancedFoodSearch.private', 'Private')}
                   </Badge>
@@ -218,16 +186,14 @@ const FoodResultCard = ({
               {!isOnline &&
                 (isFood ? foodItem.shared_with_public : mealItem.is_public) && (
                   <Badge variant="outline" className="text-xs">
-                    <Share2 className="h-3 w-3 mr-1" />
+                    <Share2 className="mr-1 h-3 w-3" />
                     {t('enhancedFoodSearch.public', 'Public')}
                   </Badge>
                 )}
               {!isOnline &&
                 item.user_id &&
                 item.user_id !== activeUserId &&
-                !(isFood
-                  ? foodItem.shared_with_public
-                  : mealItem.is_public) && (
+                !(isFood ? foodItem.shared_with_public : mealItem.is_public) && (
                   <Badge variant="outline" className="text-xs">
                     {t('enhancedFoodSearch.family', 'Family')}
                   </Badge>
@@ -253,7 +219,7 @@ const FoodResultCard = ({
                   getEnergyUnitString={nutrientConfig.getEnergyUnitString}
                   customNutrients={nutrientConfig.customNutrients}
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="mt-1 text-xs text-gray-500">
                   Per {formatServingLabel(foodItem.default_variant)}
                 </p>
                 <AllergenBadges
@@ -263,7 +229,7 @@ const FoodResultCard = ({
               </>
             )}
           </div>
-          <div className="flex items-center space-x-2 ml-2 shrink-0">
+          <div className="flex w-full items-center gap-2 sm:ml-2 sm:w-auto sm:shrink-0">
             {isFavorite && (
               <Star
                 className="h-4 w-4 shrink-0 fill-current text-yellow-500"
@@ -273,12 +239,13 @@ const FoodResultCard = ({
             {isOnline && onEditClick && (
               <Button
                 size="sm"
+                className="w-full sm:w-auto"
                 onClick={(e) => {
                   e.stopPropagation();
                   onEditClick();
                 }}
               >
-                <Edit className="w-4 h-4 mr-1" />
+                <Edit className="mr-1 h-4 w-4" />
                 {t('enhancedFoodSearch.editAndAdd', 'Edit & Add')}
               </Button>
             )}
