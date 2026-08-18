@@ -15,6 +15,22 @@ interface ApiCallOptions extends RequestInit {
 
 class HttpApiError extends Error {}
 
+const getSafeToastErrorMessage = (
+  message: string,
+  fallback = 'The service is temporarily unavailable. Please try again later.'
+): string => {
+  const trimmed = message.trim();
+  const looksLikeMarkup =
+    /<\/?[a-z][\s\S]*>/i.test(trimmed) ||
+    /(?:href|class|style|utm_source)=/i.test(trimmed);
+
+  if (!trimmed || looksLikeMarkup || trimmed.length > 240) {
+    return fallback;
+  }
+
+  return trimmed;
+};
+
 export const API_BASE_URL = '/api';
 //export const API_BASE_URL = 'http://192.168.1.111:3010';
 
@@ -226,7 +242,7 @@ export async function apiCall<T = any>(
       } else {
         toast({
           title: 'API Error',
-          description: errorMessage,
+          description: getSafeToastErrorMessage(errorMessage),
           variant: 'destructive',
         });
         if (
@@ -267,7 +283,10 @@ export async function apiCall<T = any>(
     logging.error(userLoggingLevel, 'API call network error:', err); // Log the raw error object for better debugging
     toast({
       title: 'Network Error',
-      description: errorMessage || 'Could not connect to the server.',
+      description: getSafeToastErrorMessage(
+        errorMessage,
+        'Could not connect to the server.'
+      ),
       variant: 'destructive',
     });
     throw new Error(errorMessage, { cause: err });
