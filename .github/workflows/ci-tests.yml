@@ -79,6 +79,13 @@ jobs:
           node-version: "24"
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Show formatted French overrides
+        working-directory: SparkyFitnessFrontend
+        run: |
+          pnpm exec prettier src/i18n/frOverrides.ts --write
+          echo '---BEGIN-FR-OVERRIDES---'
+          cat src/i18n/frOverrides.ts
+          echo '---END-FR-OVERRIDES---'
       - name: Validate
         working-directory: SparkyFitnessFrontend
         run: pnpm run validate
