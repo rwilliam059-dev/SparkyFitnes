@@ -4,6 +4,9 @@ import type { ToastActionElement, ToastProps } from '@/components/ui/toast';
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 5000;
+const MAX_TOAST_TEXT_LENGTH = 240;
+const SAFE_TOAST_FALLBACK =
+  'The service is temporarily unavailable. Please try again later.';
 
 type ToasterToast = ToastProps & {
   id: string;
@@ -25,6 +28,34 @@ function genId() {
   count = (count + 1) % Number.MAX_SAFE_INTEGER;
   return count.toString();
 }
+
+const sanitizeToastNode = (
+  value: React.ReactNode,
+  fallback = SAFE_TOAST_FALLBACK
+): React.ReactNode => {
+  if (typeof value !== 'string') return value;
+
+  const trimmed = value.trim();
+  const looksLikeMarkup =
+    /<\/?[a-z][\s\S]*>/i.test(trimmed) ||
+    /(?:href|class|style|utm_source)=/i.test(trimmed);
+
+  if (!trimmed || looksLikeMarkup || trimmed.length > MAX_TOAST_TEXT_LENGTH) {
+    return fallback;
+  }
+
+  return trimmed;
+};
+
+const sanitizeToastProps = <T extends Partial<ToasterToast>>(props: T): T => ({
+  ...props,
+  ...(props.title !== undefined
+    ? { title: sanitizeToastNode(props.title, 'Error') }
+    : {}),
+  ...(props.description !== undefined
+    ? { description: sanitizeToastNode(props.description) }
+    : {}),
+});
 
 type ActionType = typeof actionTypes;
 
@@ -138,18 +169,19 @@ type Toast = Omit<ToasterToast, 'id'>;
 
 function toast({ ...props }: Toast) {
   const id = genId();
+  const safeProps = sanitizeToastProps(props);
 
   const update = (props: ToasterToast) =>
     dispatch({
       type: 'UPDATE_TOAST',
-      toast: { ...props, id },
+      toast: { ...sanitizeToastProps(props), id },
     });
   const dismiss = () => dispatch({ type: 'DISMISS_TOAST', toastId: id });
 
   dispatch({
     type: 'ADD_TOAST',
     toast: {
-      ...props,
+      ...safeProps,
       id,
       open: true,
       onOpenChange: (open) => {
