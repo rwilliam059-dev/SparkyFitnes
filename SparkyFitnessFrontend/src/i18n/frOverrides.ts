@@ -6,11 +6,13 @@ const frOverrides = {
     toolCategories: {
       tooltip: 'Choisir les outils du chatbot',
       title: 'Outils du chatbot',
-      description: 'Moins d’outils permettent aux petits modèles locaux de répondre plus fiablement.',
+      description:
+        'Moins d’outils permettent aux petits modèles locaux de répondre plus fiablement.',
       presetFull: 'Complet',
       presetCore: 'Essentiel',
       clearAll: 'Tout désélectionner',
-      emptyHint: 'Aucune catégorie sélectionnée — le chatbot utilisera son ensemble d’outils par défaut.',
+      emptyHint:
+        'Aucune catégorie sélectionnée — le chatbot utilisera son ensemble d’outils par défaut.',
       food: 'Alimentation et eau',
       exercise: 'Exercice',
       checkin: 'Corps et suivis',
@@ -66,7 +68,8 @@ const frOverrides = {
     booleanFalse: 'Non',
     deleteRow: 'Supprimer la ligne',
     overrideLabel: 'Remplacer les informations d’un aliment existant',
-    overrideDescription: 'Si un aliment portant le même nom et la même marque existe déjà, met à jour ses informations nutritionnelles au lieu de faire échouer l’import.',
+    overrideDescription:
+      'Si un aliment portant le même nom et la même marque existe déjà, met à jour ses informations nutritionnelles au lieu de faire échouer l’import.',
     importing: 'Importation…',
     importData: 'Importer les données',
     importRecords_one: 'Importer {{count}} enregistrement',
@@ -74,17 +77,22 @@ const frOverrides = {
     importErrorTitle: 'Erreur d’importation',
     pasteFirst: 'Collez d’abord des données CSV.',
     invalidFormatTitle: 'Format CSV invalide',
-    headersMismatchText: 'Les colonnes ne correspondent pas au format attendu. Utilisez le modèle.',
+    headersMismatchText:
+      'Les colonnes ne correspondent pas au format attendu. Utilisez le modèle.',
     successTitle: 'Succès',
     loadedRowsFromText: '{{count}} lignes chargées depuis le texte.',
     emptyFile: 'Le fichier sélectionné est vide.',
-    headersMismatchFile: 'Les colonnes du CSV ne correspondent pas au format attendu. Associez les champs pour continuer.',
+    headersMismatchFile:
+      'Les colonnes du CSV ne correspondent pas au format attendu. Associez les champs pour continuer.',
     noDataTitle: 'Aucune donnée trouvée',
-    noDataText: 'Le fichier CSV contient des en-têtes mais aucune ligne de données.',
+    noDataText:
+      'Le fichier CSV contient des en-têtes mais aucune ligne de données.',
     validationErrorTitle: 'Erreur de validation',
     nameRequired: 'Le champ « nom » ne peut pas être vide.',
-    fileTooLarge: 'Le fichier sélectionné est trop volumineux. Importez un fichier de moins de 25 Mo.',
-    filterMissingDefault: 'Afficher les valeurs par défaut manquantes ({{count}})',
+    fileTooLarge:
+      'Le fichier sélectionné est trop volumineux. Importez un fichier de moins de 25 Mo.',
+    filterMissingDefault:
+      'Afficher les valeurs par défaut manquantes ({{count}})',
     showAllRows: 'Afficher toutes les lignes ({{count}})',
   },
   foods: {
@@ -107,9 +115,11 @@ const frOverrides = {
     },
     today: {
       medicationsTitle: 'Médicaments du jour',
-      medicationsDescription: 'Suivez les prises programmées et enregistrez les médicaments pris au besoin',
+      medicationsDescription:
+        'Suivez les prises programmées et enregistrez les médicaments pris au besoin',
       supplementsTitle: 'Compléments du jour',
-      supplementsDescription: 'Suivez les prises programmées et enregistrez les compléments pris au besoin',
+      supplementsDescription:
+        'Suivez les prises programmées et enregistrez les compléments pris au besoin',
       dueToday: 'Prévu aujourd’hui',
       asNeeded: 'Au besoin',
       logIntake: 'Enregistrer la prise',
@@ -152,7 +162,8 @@ const frOverrides = {
       logTitle: 'Enregistrer un symptôme',
       calendarTitle: 'Calendrier des symptômes',
       logsTitle: 'Symptômes enregistrés',
-      subtitle: 'Notez la gravité et le contexte physique de vos effets secondaires',
+      subtitle:
+        'Notez la gravité et le contexte physique de vos effets secondaires',
       symptom: 'Symptôme',
       addCustom: 'Ajouter un symptôme personnalisé',
       displayLabel: 'Libellé affiché',
