@@ -55,7 +55,9 @@ export const NutrientGrid = ({
   });
 
   return (
-    <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm text-gray-600 sm:grid-cols-3 lg:grid-cols-6">
+    <div
+      className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm text-gray-600 sm:grid-cols-3 lg:grid-cols-6"
+    >
       {visibleNutrients.map((nutrient) => {
         const details = nutrientDetails[nutrient];
         if (!details) return null;
