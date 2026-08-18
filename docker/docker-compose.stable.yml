@@ -1,0 +1,16 @@
+services:
+  sparkyfitness-server:
+    image: sparkyfitness-server-wiwi:stable
+    pull_policy: build
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+
+  sparkyfitness-frontend:
+    image: sparkyfitness-frontend-wiwi:stable
+    pull_policy: build
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    ports: !override
+      - "127.0.0.1:${SPARKY_FITNESS_FRONTEND_PORT:-3004}:${NGINX_LISTEN_PORT:-80}"
