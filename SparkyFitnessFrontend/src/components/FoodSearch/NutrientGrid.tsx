@@ -90,11 +90,15 @@ export const NutrientGrid = ({
             key={nutrient}
             className="flex min-w-0 flex-wrap items-baseline gap-x-1 leading-tight"
           >
-            <span className={`whitespace-nowrap font-medium ${details.color}`}>
+            <span
+              className={`whitespace-nowrap font-medium ${details.color}`}
+            >
               {displayValue}
               {details.unit}
             </span>
-            <span className="break-normal text-xs sm:text-sm">{details.label}</span>
+            <span className="break-normal text-xs sm:text-sm">
+              {details.label}
+            </span>
           </div>
         );
       })}
