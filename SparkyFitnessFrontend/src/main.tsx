@@ -37,6 +37,22 @@ const resolveMessage = (
   }
   return message;
 };
+
+// Backend/provider failures can occasionally contain a complete HTML response
+// (for example an upstream Open Food Facts error page). Keep that detail in the
+// logs, but never dump markup or an excessively long response into a user toast.
+const getSafeErrorDetail = (err: unknown): string => {
+  if (!(err instanceof Error) || !err.message) return '';
+
+  const message = err.message.trim();
+  const looksLikeMarkup =
+    /<\/?[a-z][\s\S]*>/i.test(message) ||
+    /(?:href|class|style|utm_source)=/i.test(message);
+
+  if (looksLikeMarkup || message.length > 240) return '';
+  return message;
+};
+
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (e, query) => {
@@ -61,11 +77,9 @@ const queryClient = new QueryClient({
         err,
         variables
       );
-      // Surface backend-provided error detail alongside the meta-defined
-      // friendly message. Previously the meta string would always win,
-      // hiding 401/429/500 detail from the user (e.g. Garmin auth, MFA,
-      // rate-limit reasons all collapsed to "Failed to connect to Garmin.").
-      const errDetail = err instanceof Error && err.message ? err.message : '';
+      // Surface only short, plain-text backend detail alongside the friendly
+      // message. Raw HTML/provider payloads remain available in the logs.
+      const errDetail = getSafeErrorDetail(err);
       const description =
         resolvedErrorMessage && errDetail && errDetail !== resolvedErrorMessage
           ? `${resolvedErrorMessage} — ${errDetail}`
