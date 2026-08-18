@@ -157,7 +157,9 @@ const FoodResultCard = ({
                   {providerLabel}
                 </Badge>
               )}
-              {isFood && foodItem.provider_verified && <ProviderVerifiedBadge />}
+              {isFood && foodItem.provider_verified && (
+                <ProviderVerifiedBadge />
+              )}
               {isFood &&
                 foodItem.default_variant?.source === 'ai_estimate' &&
                 foodItem.default_variant.ai_confidence && (
@@ -178,7 +180,9 @@ const FoodResultCard = ({
               {!isOnline &&
                 item.user_id &&
                 item.user_id === activeUserId &&
-                !(isFood ? foodItem.shared_with_public : mealItem.is_public) && (
+                !(isFood
+                  ? foodItem.shared_with_public
+                  : mealItem.is_public) && (
                   <Badge variant="outline" className="text-xs">
                     {t('enhancedFoodSearch.private', 'Private')}
                   </Badge>
@@ -193,7 +197,9 @@ const FoodResultCard = ({
               {!isOnline &&
                 item.user_id &&
                 item.user_id !== activeUserId &&
-                !(isFood ? foodItem.shared_with_public : mealItem.is_public) && (
+                !(isFood
+                  ? foodItem.shared_with_public
+                  : mealItem.is_public) && (
                   <Badge variant="outline" className="text-xs">
                     {t('enhancedFoodSearch.family', 'Family')}
                   </Badge>
