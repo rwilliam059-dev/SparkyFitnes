@@ -56,9 +56,11 @@ export const searchFoodsV2Options = (
     searchFoodsV2(providerType, query, providerId, page, pageSize, autoScale),
   staleTime: 1000 * 60 * 5,
   enabled: !!query,
-  // Provider lookups are already user-driven and can be rate limited upstream.
-  // Retrying a rejected live-search call immediately only increases pressure.
-  retry: false,
+  // Open Food Facts is occasionally transiently unavailable. Retry that
+  // provider once after a short pause so the user does not have to retype the
+  // same search manually, while keeping all other providers single-attempt.
+  retry: providerType === 'openfoodfacts' ? 1 : false,
+  retryDelay: providerType === 'openfoodfacts' ? 900 : undefined,
 });
 
 export const searchBarcodeV2Options = (
