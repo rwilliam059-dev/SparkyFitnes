@@ -225,7 +225,8 @@ const frOverrides = {
     bodyFatAlgorithm: 'Méthode de calcul de la masse grasse',
     calories: 'Calories',
     energyUnitLabel: 'Unité d’énergie',
-    includeBmrInNetCalories: 'Inclure le métabolisme basal dans les calories nettes',
+    includeBmrInNetCalories:
+      'Inclure le métabolisme basal dans les calories nettes',
     joules: 'Joules',
     saveError: 'Erreur',
     saveSuccess: 'Succès',
@@ -273,7 +274,8 @@ const frOverrides = {
       mechanicIsolation: 'Isolation',
       mechanicCompound: 'Polyarticulaire',
       equipmentLabel: 'Équipement (séparé par des virgules)',
-      primaryMusclesLabel: 'Muscles principaux (séparés par des virgules)',
+      primaryMusclesLabel:
+        'Muscles principaux (séparés par des virgules)',
       secondaryMusclesLabel:
         'Muscles secondaires (séparés par des virgules)',
       instructionsLabel: 'Instructions (une par ligne)',
@@ -297,7 +299,8 @@ const frOverrides = {
       topPresetsTitle: 'Séances les plus utilisées',
       noTopPresets: 'Aucune séance populaire.',
       searchResultsTitle: 'Résultats de recherche',
-      noMatchingPresets: 'Aucune séance ne correspond à votre recherche.',
+      noMatchingPresets:
+        'Aucune séance ne correspond à votre recherche.',
     },
     exerciseSearch: {
       add: 'Ajouter',
@@ -390,7 +393,8 @@ const frOverrides = {
     loading: 'Chargement…',
     loadMore: 'Afficher plus',
     noExercisesInPreset: 'Aucun exercice dans cette séance',
-    failedToLoadPresets: 'Impossible de charger les séances prédéfinies.',
+    failedToLoadPresets:
+      'Impossible de charger les séances prédéfinies.',
     createSuccess: 'Séance prédéfinie créée avec succès.',
     createError: 'Impossible de créer la séance prédéfinie.',
     updateSuccess: 'Séance prédéfinie mise à jour.',
