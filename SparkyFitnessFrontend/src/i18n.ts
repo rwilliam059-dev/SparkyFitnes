@@ -4,6 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi from 'i18next-http-backend';
 import frOverrides from './i18n/frOverrides';
 import frMobileOverrides from './i18n/frMobileOverrides';
+import frPass2Overrides from './i18n/frPass2Overrides';
 import { getSupportedLanguages } from './utils/languageUtils';
 
 i18n.use(HttpApi).use(LanguageDetector).use(initReactI18next);
@@ -33,6 +34,7 @@ void i18n
   .then(() => {
     i18n.addResourceBundle('fr', 'translation', frOverrides, true, true);
     i18n.addResourceBundle('fr', 'translation', frMobileOverrides, true, true);
+    i18n.addResourceBundle('fr', 'translation', frPass2Overrides, true, true);
   });
 
 export default i18n;
