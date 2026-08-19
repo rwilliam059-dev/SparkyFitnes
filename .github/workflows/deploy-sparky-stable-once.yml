@@ -1,0 +1,45 @@
+name: Deploy Sparky Stable Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/deploy-sparky-stable-once.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, x64, wiwi-dedicated]
+    timeout-minutes: 15
+    steps:
+      - name: Deploy frontend from main
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP=/opt/sparkyfitness
+
+          test -d "$APP/.git"
+          test -f "$APP/.env"
+
+          if [ -n "$(sudo -n -u wiwi-sysboss git -C "$APP" status --porcelain)" ]; then
+            echo "Working tree is not clean; refusing to deploy."
+            exit 1
+          fi
+
+          sudo -n -u wiwi-sysboss git -C "$APP" pull --ff-only origin main
+
+          cd "$APP"
+          sudo -n docker compose \
+            --env-file /opt/sparkyfitness/.env \
+            -f docker/docker-compose.prod.yml \
+            -f docker/docker-compose.stable.yml \
+            up -d --build sparkyfitness-frontend
+
+          curl -fsS http://127.0.0.1:3004/ >/dev/null
+          sudo -n docker compose \
+            --env-file /opt/sparkyfitness/.env \
+            -f docker/docker-compose.prod.yml \
+            -f docker/docker-compose.stable.yml \
+            ps sparkyfitness-frontend
