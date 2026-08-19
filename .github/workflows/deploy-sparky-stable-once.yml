@@ -1,5 +1,6 @@
 name: Deploy Sparky Stable Once
 
+# Trigger refreshed after French mobile cleanup deployment.
 on:
   push:
     branches: [main]
