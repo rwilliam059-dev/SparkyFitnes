@@ -104,7 +104,9 @@ const NutritionSummaryCard = ({
   }, [summaryPreferences]);
 
   const goalTips = useMemo(() => {
-    const isFrench = (i18n.resolvedLanguage ?? i18n.language ?? '').startsWith('fr');
+    const isFrench = (i18n.resolvedLanguage ?? i18n.language ?? '').startsWith(
+      'fr'
+    );
     const calorieGoal = Number(goals.calories ?? 0);
     const proteinGoal = Number(goals.protein ?? 0);
     const carbsGoal = Number(goals.carbs ?? 0);
@@ -115,8 +117,10 @@ const NutritionSummaryCard = ({
     const carbsLeft = Math.max(0, carbsGoal - dayTotals.carbs);
     const fatLeft = Math.max(0, fatGoal - dayTotals.fat);
 
-    const proteinMissing = proteinGoal > 0 && proteinLeft >= Math.max(10, proteinGoal * 0.12);
-    const carbsMissing = carbsGoal > 0 && carbsLeft >= Math.max(15, carbsGoal * 0.12);
+    const proteinMissing =
+      proteinGoal > 0 && proteinLeft >= Math.max(10, proteinGoal * 0.12);
+    const carbsMissing =
+      carbsGoal > 0 && carbsLeft >= Math.max(15, carbsGoal * 0.12);
     const fatMissing = fatGoal > 0 && fatLeft >= Math.max(6, fatGoal * 0.12);
     const fatNearlyFull = fatGoal > 0 && dayTotals.fat >= fatGoal * 0.9;
     const calorieNearlyFull =
@@ -124,7 +128,12 @@ const NutritionSummaryCard = ({
 
     const tips: string[] = [];
 
-    if (calorieGoal <= 0 && proteinGoal <= 0 && carbsGoal <= 0 && fatGoal <= 0) {
+    if (
+      calorieGoal <= 0 &&
+      proteinGoal <= 0 &&
+      carbsGoal <= 0 &&
+      fatGoal <= 0
+    ) {
       return [];
     }
 
