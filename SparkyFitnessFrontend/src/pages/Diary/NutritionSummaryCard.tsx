@@ -14,7 +14,7 @@ import EditGoalsForToday from '@/pages/Goals/EditGoalsForToday';
 import { useMemo, useState } from 'react';
 import { DEFAULT_GOALS } from '@/constants/goals';
 import { Button } from '@/components/ui/button';
-import { ClipboardCopy, History, CheckCircle2 } from 'lucide-react';
+import { ClipboardCopy, History, CheckCircle2, Lightbulb } from 'lucide-react';
 import {
   useCopyAllFoodEntriesMutation,
   useCopyAllFoodEntriesFromYesterdayMutation,
@@ -68,7 +68,8 @@ const NutritionSummaryCard = ({
   const { data: goalTypePreferences = {} } = useNutrientGoalPreferences();
   const isMobile = useIsMobile();
   const platform = isMobile ? 'mobile' : 'desktop';
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n?.resolvedLanguage ?? i18n?.language ?? '';
 
   const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false);
 
@@ -102,6 +103,101 @@ const NutritionSummaryCard = ({
       ? summaryPreferences.visible_nutrients
       : Object.keys(DEFAULT_GOALS);
   }, [summaryPreferences]);
+
+  const goalTips = useMemo(() => {
+    const isFrench = currentLanguage.startsWith('fr');
+    const calorieGoal = Number(goals.calories ?? 0);
+    const proteinGoal = Number(goals.protein ?? 0);
+    const carbsGoal = Number(goals.carbs ?? 0);
+    const fatGoal = Number(goals.fat ?? 0);
+
+    const caloriesLeft = Math.max(0, calorieGoal - dayTotals.calories);
+    const proteinLeft = Math.max(0, proteinGoal - dayTotals.protein);
+    const carbsLeft = Math.max(0, carbsGoal - dayTotals.carbs);
+    const fatLeft = Math.max(0, fatGoal - dayTotals.fat);
+
+    const proteinMissing =
+      proteinGoal > 0 && proteinLeft >= Math.max(10, proteinGoal * 0.12);
+    const carbsMissing =
+      carbsGoal > 0 && carbsLeft >= Math.max(15, carbsGoal * 0.12);
+    const fatMissing = fatGoal > 0 && fatLeft >= Math.max(6, fatGoal * 0.12);
+    const fatNearlyFull = fatGoal > 0 && dayTotals.fat >= fatGoal * 0.9;
+    const calorieNearlyFull =
+      calorieGoal > 0 && caloriesLeft <= Math.max(120, calorieGoal * 0.06);
+
+    const tips: string[] = [];
+
+    if (
+      calorieGoal <= 0 &&
+      proteinGoal <= 0 &&
+      carbsGoal <= 0 &&
+      fatGoal <= 0
+    ) {
+      return [];
+    }
+
+    if (calorieNearlyFull && (proteinMissing || carbsMissing || fatMissing)) {
+      tips.push(
+        isFrench
+          ? `Tu es proche de ton objectif calorique. Ne cherche pas à remplir toutes les macros à tout prix aujourd’hui.`
+          : `You are close to your calorie goal. Do not force every macro target at the expense of calories today.`
+      );
+    }
+
+    if (proteinMissing) {
+      if (fatNearlyFull) {
+        tips.push(
+          isFrench
+            ? `Il te manque environ ${Math.round(proteinLeft)} g de protéines et tes lipides sont presque atteints : privilégie skyr, fromage blanc allégé, poulet, thon au naturel ou blancs d’œufs.`
+            : `You are about ${Math.round(proteinLeft)} g short on protein and fat is nearly full: favor lean options such as skyr, low-fat yogurt, chicken, tuna in water or egg whites.`
+        );
+      } else {
+        tips.push(
+          isFrench
+            ? `Il te manque environ ${Math.round(proteinLeft)} g de protéines : pense à une source protéinée au prochain repas ou en collation.`
+            : `You are about ${Math.round(proteinLeft)} g short on protein: add a protein-rich food to your next meal or snack.`
+        );
+      }
+    }
+
+    if (carbsMissing && !calorieNearlyFull) {
+      tips.push(
+        isFrench
+          ? `Il te reste environ ${Math.round(carbsLeft)} g de glucides : fruits, riz, pommes de terre, avoine ou pain peuvent compléter facilement la journée.`
+          : `You have about ${Math.round(carbsLeft)} g of carbs left: fruit, rice, potatoes, oats or bread can help round out the day.`
+      );
+    }
+
+    if (fatMissing && !calorieNearlyFull && !fatNearlyFull) {
+      tips.push(
+        isFrench
+          ? `Il te manque environ ${Math.round(fatLeft)} g de lipides : une petite portion de noix, avocat, œufs ou huile d’olive peut suffire.`
+          : `You have about ${Math.round(fatLeft)} g of fat left: a small portion of nuts, avocado, eggs or olive oil may be enough.`
+      );
+    }
+
+    if (
+      tips.length === 0 &&
+      calorieGoal > 0 &&
+      caloriesLeft > Math.max(180, calorieGoal * 0.08)
+    ) {
+      tips.push(
+        isFrench
+          ? `Il te reste environ ${Math.round(caloriesLeft)} kcal. Une collation équilibrée avec protéines + glucides est un bon moyen de te rapprocher de tes objectifs.`
+          : `You have about ${Math.round(caloriesLeft)} kcal left. A balanced protein + carb snack is a simple way to move closer to your goals.`
+      );
+    }
+
+    if (tips.length === 0) {
+      tips.push(
+        isFrench
+          ? `Tes objectifs principaux sont bien couverts aujourd’hui. Continue simplement à écouter ta faim et ta satiété.`
+          : `Your main nutrition targets are well covered today. Keep following your hunger and fullness cues.`
+      );
+    }
+
+    return tips.slice(0, 3);
+  }, [dayTotals, goals, currentLanguage]);
 
   return (
     <Card className="h-full">
@@ -203,9 +299,9 @@ const NutritionSummaryCard = ({
                 : metadata.color;
 
             const barColor = isOverLimit
-              ? '#ef4444' // red-500
+              ? '#ef4444'
               : isTargetType && !inTargetRange
-                ? '#f59e0b' // amber-500
+                ? '#f59e0b'
                 : metadata.chartColor;
 
             const targetMinVal =
@@ -268,6 +364,28 @@ const NutritionSummaryCard = ({
             );
           })}
         </div>
+
+        {goalTips.length > 0 && (
+          <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50/70 p-3 dark:border-amber-900/60 dark:bg-amber-950/20">
+            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-900 dark:text-amber-200">
+              <Lightbulb className="h-4 w-4" />
+              <span>
+                {currentLanguage.startsWith('fr')
+                  ? 'Conseils pour atteindre tes objectifs'
+                  : 'Tips to reach your goals'}
+              </span>
+            </div>
+            <div className="space-y-2 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
+              {goalTips.map((tip) => (
+                <div key={tip} className="flex gap-2">
+                  <span aria-hidden="true">•</span>
+                  <span>{tip}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <MiniNutritionTrends
           selectedDate={selectedDate}
           customNutrients={customNutrients}

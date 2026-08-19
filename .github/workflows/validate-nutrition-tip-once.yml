@@ -1,0 +1,41 @@
+name: Validate Nutrition Tip Once
+
+on:
+  push:
+    branches: [feat/nutrition-goal-tips]
+    paths:
+      - ".github/workflows/validate-nutrition-tip-once.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: [self-hosted, linux, x64, wiwi-dedicated]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/nutrition-goal-tips
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Validate frontend
+        run: pnpm --dir SparkyFitnessFrontend run validate
+      - name: Test frontend
+        run: pnpm --dir SparkyFitnessFrontend test
+      - name: Mark validation complete
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/validate-nutrition-tip-once.yml
+          rm -f SparkyFitnessFrontend/.ci-trigger-nutrition-tips
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "ci: nutrition goal tips validated"
+          git push origin HEAD:feat/nutrition-goal-tips
