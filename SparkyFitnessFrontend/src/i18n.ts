@@ -31,10 +31,15 @@ void i18n
       useSuspense: false,
     },
   })
-  .then(() => {
+  .then(async () => {
     i18n.addResourceBundle('fr', 'translation', frOverrides, true, true);
     i18n.addResourceBundle('fr', 'translation', frMobileOverrides, true, true);
     i18n.addResourceBundle('fr', 'translation', frPass2Overrides, true, true);
+
+    // Resource bundles are added after initialization. Re-applying the active
+    // language notifies React subscribers so freshly added overrides are shown
+    // immediately instead of waiting for a reload or another language change.
+    await i18n.changeLanguage(i18n.language);
   });
 
 export default i18n;
