@@ -2,12 +2,12 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi from 'i18next-http-backend';
+import frOverrides from './i18n/frOverrides';
 import { getSupportedLanguages } from './utils/languageUtils';
 
-i18n
-  .use(HttpApi)
-  .use(LanguageDetector)
-  .use(initReactI18next)
+i18n.use(HttpApi).use(LanguageDetector).use(initReactI18next);
+
+void i18n
   .init({
     supportedLngs: getSupportedLanguages(),
     fallbackLng: 'en',
@@ -28,6 +28,9 @@ i18n
     react: {
       useSuspense: false,
     },
+  })
+  .then(() => {
+    i18n.addResourceBundle('fr', 'translation', frOverrides, true, true);
   });
 
 export default i18n;
