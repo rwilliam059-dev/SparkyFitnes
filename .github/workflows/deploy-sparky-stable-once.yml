@@ -43,3 +43,5 @@ jobs:
             -f docker/docker-compose.prod.yml \
             -f docker/docker-compose.stable.yml \
             ps sparkyfitness-frontend
+
+          echo "Deployment completed successfully."
