@@ -69,6 +69,7 @@ const NutritionSummaryCard = ({
   const isMobile = useIsMobile();
   const platform = isMobile ? 'mobile' : 'desktop';
   const { t, i18n } = useTranslation();
+  const currentLanguage = i18n?.resolvedLanguage ?? i18n?.language ?? '';
 
   const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false);
 
@@ -104,9 +105,7 @@ const NutritionSummaryCard = ({
   }, [summaryPreferences]);
 
   const goalTips = useMemo(() => {
-    const isFrench = (i18n.resolvedLanguage ?? i18n.language ?? '').startsWith(
-      'fr'
-    );
+    const isFrench = currentLanguage.startsWith('fr');
     const calorieGoal = Number(goals.calories ?? 0);
     const proteinGoal = Number(goals.protein ?? 0);
     const carbsGoal = Number(goals.carbs ?? 0);
@@ -198,7 +197,7 @@ const NutritionSummaryCard = ({
     }
 
     return tips.slice(0, 3);
-  }, [dayTotals, goals, i18n.language, i18n.resolvedLanguage]);
+  }, [dayTotals, goals, currentLanguage]);
 
   return (
     <Card className="h-full">
@@ -371,7 +370,7 @@ const NutritionSummaryCard = ({
             <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-900 dark:text-amber-200">
               <Lightbulb className="h-4 w-4" />
               <span>
-                {(i18n.resolvedLanguage ?? i18n.language ?? '').startsWith('fr')
+                {currentLanguage.startsWith('fr')
                   ? 'Conseils pour atteindre tes objectifs'
                   : 'Tips to reach your goals'}
               </span>
